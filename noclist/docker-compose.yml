@@ -1,0 +1,11 @@
+version: "3"
+services:
+  noc:
+    container_name: noclist_1
+    build:
+      context: .
+    command: bundle exec ruby bin/noclist.rb -u http://nocservice:8888
+  nocservice:
+    image: adhocteam/noclist
+    ports:
+      - 8888:8888
