@@ -1,0 +1,26 @@
+version: "3"
+services:
+  app:
+    container_name: containerize_app_1
+    # your code goes here ...
+    build:
+      context: ./app
+    expose:
+      - 8000
+    environment:
+      FLASK_ENV: development
+      FLASK_APP: server
+    volumes:
+      - ./app/src:/app
+    command: flask run --host 0.0.0.0 --port 8000
+  nginx:
+    container_name: containerize_nginx_1
+    # your code goes here ...
+    build:
+      context: ./nginx
+    volumes:
+      - ./nginx/files/localhost.crt:/etc/pki/nginx/certs/server.crt
+      - ./nginx/files/localhost.key:/etc/pki/nginx/certs/private/server.key
+    ports:
+      - 80:80
+      - 443:443
