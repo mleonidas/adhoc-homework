@@ -1,5 +1,5 @@
 module Retry
-  def self.http(enumerable=nil, &block)
+  def self.http(enumerable=1.times, &block)
     procedure = lambda { |_| block.call }
     last_exception = nil
 
@@ -7,14 +7,9 @@ module Retry
     backoff = 0.1
     backoff_max = 2.0
 
-    if enumerable.nil?
-      enumerable = 1.times
-    end
-
     enumerable.each do |val|
       begin
         return procedure.call(val)
-
       rescue => e
         puts "Failed (#{e}). Retrying in #{backoff} seconds"
         last_exception = e
