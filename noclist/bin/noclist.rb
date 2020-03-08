@@ -1,9 +1,6 @@
 require 'json'
 require_relative '../lib/noclist'
-require "pry"
 require 'optparse'
-
-
 
 
 client = RestClient
