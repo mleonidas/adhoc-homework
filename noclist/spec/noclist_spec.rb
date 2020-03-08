@@ -30,30 +30,36 @@ describe Noclist do
         allow(RestClient::Request).to receive(:execute).and_return(response)
         expect(noclist.get_token).to eq("supersecret")
       end
-    end
-  end
+
+      it "should retry 3 times then exit" do
+        expect(RestClient::Request).to receive(:execute).exactly(3).times
+          .and_raise(RestClient::Exception)
+
+        expect{noclist.get_token}.to  raise_error(RestClient::Exception)
+      end
 
 
-  describe "#auth_checksum" do
-    context  do
-      it "sha256 hexdigests the string" do
 
-        token = "supersecret"
-        local_digest = Digest::SHA256.hexdigest(token + "/users")
-        expect(noclist.auth_checksum(token)).to eq local_digest
+      it "should fail 2 times then succeed" do
+        response = instance_double(RestClient::Response,
+                                   body: 'somethinghere'.to_json,
+                                   headers: {badsec_authentication_token: "supersecret"})
+
+        expect(RestClient::Request).to receive(:execute).exactly(2).times
+          .and_raise(RestClient::Exception)
+
+        expect(RestClient::Request).to receive(:execute).and_return(response)
+        expect(noclist.get_token).to eq("supersecret")
       end
     end
   end
 
-  describe "#http_retry" do
-    context "errors are raised" do
-
-      it "should fail 3 times before exiting" do
-        expect(RestClient::Request).to receive(:execute).exactly(3).times
-          .and_raise(RestClient::Exception)
-
-        expect{noclist.http_retry('/users')}.to  raise_error(NocListRetryMax)
-        expect(noclist.retry_count).to eq 2
+  describe "#auth_checksum" do
+    context  do
+      it "sha256 hexdigests the string" do
+        token = "supersecret"
+        local_digest = Digest::SHA256.hexdigest(token + "/users")
+        expect(noclist.auth_checksum(token)).to eq local_digest
       end
     end
   end

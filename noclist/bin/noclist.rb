@@ -19,6 +19,6 @@ end
 begin
   users = Noclist.new(client, url).users
   puts JSON.pretty_generate(users.lines.map(&:chomp))
-rescue NocListRetryMax
+rescue RestClient::Exception
   exit 127
 end

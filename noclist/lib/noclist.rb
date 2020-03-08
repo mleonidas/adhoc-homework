@@ -3,34 +3,14 @@ require 'rest-client'
 require 'digest'
 require 'json'
 
+require_relative "./retry.rb"
 
-
-class NocListRetryMax < Exception; end
 class Noclist
   attr_accessor :client, :url
-  def initialize(client, url, retries=2)
+  def initialize(client, url, retries=3)
     @client = client
     @url = url
     @max_retries = retries
-  end
-
-  def http_retry path, headers={}
-    begin
-      response = client.get(url + path, headers)
-    rescue RestClient::Exception
-     @retries ||= 0
-     if @retries < @max_retries
-       @retries += 1
-       retry
-     else
-       raise NocListRetryMax.new("Maximum retry met")
-     end
-    end
-    response
-  end
-
-  def retry_count
-    @retries
   end
 
   def auth_checksum token
@@ -40,12 +20,16 @@ class Noclist
   end
 
   def get_token
-    resp = http_retry("/auth")
+    resp = Retry.http(@max_retries.times) do
+      client.get(url + "/auth")
+    end
     resp.headers[:badsec_authentication_token]
   end
 
   def get_user_ids checksum
-    http_retry("/users", headers={x_request_checksum: checksum})
+    Retry.http(@max_retries.times) do
+      client.get(url + "/users", headers={x_request_checksum: checksum})
+    end
   end
 
   def users
