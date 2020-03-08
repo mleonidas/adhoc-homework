@@ -58,7 +58,7 @@ func checkErr(e error) {
 }
 
 // use this to just get the amount of records in the file
-func readHeader(file io.Reader, number int) uint32 {
+func readHeader(file io.Reader) uint32 {
 	ms := make([]byte, 4)
 	version := make([]byte, 1)
 	nor := make([]byte, 4)
@@ -145,7 +145,7 @@ func main() {
 	// lets just defer this in a real situation maybe keep track and close
 	defer f.Close()
 
-	recs := readHeader(f, 4)
+	recs := readHeader(f)
 
 	for index = 0; index <= recs; index++ {
 		rec := getRecord(f)
