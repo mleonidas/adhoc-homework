@@ -27,15 +27,18 @@ describe Noclist do
                                    body: 'somethinghere'.to_json,
                                    headers: {badsec_authentication_token: "supersecret"})
 
-        allow(RestClient::Request).to receive(:execute).and_return(response)
+        allow(RestClient::Request).to receive(:execute)
+          .and_return(response)
+
         expect(noclist.get_token).to eq("supersecret")
       end
 
       it "should retry 3 times then exit" do
-        expect(RestClient::Request).to receive(:execute).exactly(3).times
+        expect(RestClient::Request).to receive(:execute)
+          .exactly(3).times
           .and_raise(RestClient::Exception)
 
-        expect{noclist.get_token}.to  raise_error(RestClient::Exception)
+        expect{noclist.get_token}.to raise_error(RestClient::Exception)
       end
 
 
@@ -45,10 +48,13 @@ describe Noclist do
                                    body: 'somethinghere'.to_json,
                                    headers: {badsec_authentication_token: "supersecret"})
 
-        expect(RestClient::Request).to receive(:execute).exactly(2).times
+        expect(RestClient::Request).to receive(:execute)
+          .exactly(2).times
           .and_raise(RestClient::Exception)
 
-        expect(RestClient::Request).to receive(:execute).and_return(response)
+        expect(RestClient::Request).to receive(:execute)
+          .and_return(response)
+
         expect(noclist.get_token).to eq("supersecret")
       end
     end

@@ -24,6 +24,7 @@ module Retry
       end
     end
 
+
     last_exception.set_backtrace(StandardError.new.backtrace)
 
     raise last_exception
